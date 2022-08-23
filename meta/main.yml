@@ -3,7 +3,7 @@ galaxy_info:
   description: Ansible integration for BunkerWeb
   company: Bunkerity
   license: AGPL-3.0-only
-  
+  role_name: bunkerweb  
   min_ansible_version: 2.1
   # To view available platforms and versions (or releases), visit:
   # https://galaxy.ansible.com/api/v1/platforms/
