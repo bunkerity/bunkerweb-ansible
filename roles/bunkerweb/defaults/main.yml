@@ -1,0 +1,60 @@
+---
+# Version of bunkerweb.
+# Default: 1.4.2.
+bunkerweb_version: 1.4.2
+
+# Version of nginx.
+# Default: 1.20.2.
+nginx_version: 1.20.2
+
+# Used to not upgrade Bunkerweb and Nginx after a "apt-get upgrade".
+# There is no reason to touch it unless you know what you are doing.
+# Because Bunkerweb didn't work with the latest versions of Nginx.
+# Default: true
+freeze_versions: true
+
+# Used to activate the Bunkerweb ui .
+# Default: false.
+enable_ui: false
+
+# Customize the file ui.env
+# By default it will be copied from the files/variables.env withing the role.
+# To overwrite it, set the path to the file.
+custom_ui: files/ui.env
+
+# Customize the file variables.env.
+# By default it will be copied from the files/variables.env within the role.
+# To overwrite it, set this and provide the path to your file.
+variables_env: files/variables.env
+
+# All types of custom configs.
+# http: https://docs.bunkerweb.io/1.4/quickstart-guide/#custom-configurations
+# server-http: https://docs.bunkerweb.io/1.4/quickstart-guide/#custom-configurations
+# default-server-http: https://docs.bunkerweb.io/1.4/quickstart-guide/#custom-configurations 
+# modsec-crs: https://docs.bunkerweb.io/1.4/quickstart-guide/#custom-configurations
+# modsec: https://docs.bunkerweb.io/1.4/quickstart-guide/#custom-configurations
+# To overwrite it, provide the path to your file, in the section you're interested in.
+# Default is an empty dictionary.
+custom_configs_path: 
+ http: 
+ server-http: 
+ default-server-http: 
+ modsec-crs: 
+ modsec: 
+
+# Define a website to be deployed on the server.
+# The website will be created in the /opt/bunkerweb/www/ directory.
+# To fullfill the variable use the path of the folder website.
+# Default is an empty string. 
+custom_www: ""
+
+# When set, automatically install custom_plugins for Bunkerweb.
+# Needed a path for a file containing the list of custom_plugins.
+# Default is an empty string.
+custom_plugins: ""
+
+# By defautl nginx change it to your user if you want to change it.
+custom_www_owner: nginx
+
+# By defautl nginx change it to your group if you want to change it.
+custom_www_group: nginx

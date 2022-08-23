@@ -1,0 +1,104 @@
+---
+- name: (Fedora) Upgrade the system
+  yum:
+    name: '*'
+    state: latest
+- name: (Fedora) Install nginx dnf version {{ nginx_version }}
+  dnf:
+    name: "nginx-{{ nginx_version }}"
+    state: present
+- name: (Fedora) Install python3-dnf-plugin-versionlock
+  dnf:
+    name: "python3-dnf-plugin-versionlock"
+    state: present
+- name: (Fedora) Prevent nginx from being updated
+  community.general.yum_versionlock:
+    state: present
+    name: "nginx-{{ nginx_version }}"
+- name: (Fedora) add bunkerweb rpm-key
+  rpm_key: 
+    key: https://packagecloud.io/bunkerity/bunkerweb/gpgkey 
+    state: present 
+    fingerprint: 9F5B478F976C7F30191887DCA84F8F37160CA01F
+- name: (Fedora) add bunkerweb yum repository
+  yum_repository: 
+    name: bunkerity_bunkerweb
+    description: Bunkerweb repo
+    baseurl: https://packagecloud.io/bunkerity/bunkerweb/fedora/36/$basearch
+    file: bunkerity_bunkerweb
+    gpgcheck: no
+    state: present 
+- name: (Fedora) Install bunkerweb dnf version {{ bunkerweb_version }}
+  dnf:
+    name: "bunkerweb-{{ bunkerweb_version }}"
+    state: present
+- name: (Fedora) Prevent bunkerweb from being updated
+  community.general.yum_versionlock:
+    state: present
+    name: "bunkerweb={{ bunkerweb_version }}"
+- name: (Fedora) Replace /opt/bunkerweb/variables.env
+  copy:
+    src: "{{ variables_env }}"
+    dest: /opt/bunkerweb/variables.env
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  notify: (Handler) restart bunkerweb
+- name: (Fedora) Replace /opt/bunkerweb/ui.env
+  copy:
+    src: "{{ custom_ui }}"
+    dest: /opt/bunkerweb/ui.env
+    owner: root
+    group: root
+    mode: 0644
+    force: yes  
+  notify: (Handler) restart bunkerweb-ui
+- name: (Fedora) If var {{enable_ui}} is false, systemctl disable bunkerweb-ui
+  service:
+    name: bunkerweb-ui
+    state: stopped
+    enabled: no
+  when: enable_ui|bool == false
+- name: (Fedora) Loop dictionary {{custom_configs_path}} and copy files to /opt/bunkerweb/configs 
+  copy:
+    src: "{{ item.value }}"
+    dest: /opt/bunkerweb/configs/
+    owner: root
+    group: nginx
+    mode: 0770
+    force: yes
+  notify: (Handler) restart bunkerweb
+  with_dict: "{{ custom_configs_path }}"
+  when: item.value != None
+- name: (Fedora) Add /opt/bunkerweb/www/ with {{custom_www}}
+  copy:
+    src: "{{ custom_www }}"
+    dest: /opt/bunkerweb/www/
+    owner: "{{ custom_www_owner }}"
+    group: "{{ custom_www_group }}"
+    mode: 0640
+    force: yes
+  notify: (Handler) restart bunkerweb
+  when: custom_www|length > 0
+- name: Recursively change permission of folders
+  file:
+    path: /opt/bunkerweb/www/{{custom_www}}
+    state: directory
+    recurse: yes
+    mode: '0750'
+    force: yes
+  notify: (Handler) restart bunkerweb
+  when: custom_www|length > 0
+- name: (Fedora) Add /opt/bunkerweb/plugins/ with {{custom_plugins}}
+  copy:
+    src: "{{ item }}"
+    dest: /opt/bunkerweb/custom_plugins/
+    owner: nginx
+    group: nginx
+    mode: 0770
+    force: yes
+  with_fileglob:
+    - "{{ custom_plugins }}/*"
+  when: custom_plugins|length > 0
+  notify: (Handler) restart bunkerweb

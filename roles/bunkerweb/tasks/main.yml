@@ -1,0 +1,14 @@
+---
+# tasks file for bunkerweb
+- name: Debian
+  include_tasks: roles/bunkerweb/tasks/debian.yml
+  when: ansible_facts['distribution'] == 'Debian'
+- name: Ubuntu
+  include_tasks: roles/bunkerweb/tasks/ubuntu.yml
+  when: ansible_facts['distribution'] == 'Ubuntu'
+- name: CentOs
+  include_tasks: roles/bunkerweb/tasks/centos.yml
+  when: ansible_facts['distribution'] == 'CentOS'
+- name: Fedora
+  include_tasks: roles/bunkerweb/tasks/fedora.yml
+  when: ansible_facts['distribution'] == 'Fedora'

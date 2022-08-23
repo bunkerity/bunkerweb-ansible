@@ -1,0 +1,116 @@
+---
+- name: (Centos) Upgrade the system
+  yum:
+    name: '*'
+    state: latest
+- name: (Centos) Copy ../files/nginx.repo to /etc/yum.repos.d/nginx.repo
+  copy:
+    src: ../files/nginx.repo
+    dest: /etc/yum.repos.d/nginx.repo
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+- name: (Centos) Install epel-release dnf
+  dnf:
+    name: "epel-release"
+    state: present
+- name: (Centos) Install nginx dnf version {{ nginx_version }}
+  dnf:
+    name: "nginx-{{ nginx_version }}"
+    state: present
+- name: (Centos) Install python3-dnf-plugin-versionlock
+  dnf:
+    name: "python3-dnf-plugin-versionlock"
+    state: present
+- name: (Centos) Prevent nginx from being updated
+  community.general.yum_versionlock:
+    state: present
+    name: "nginx-{{ nginx_version }}"
+- name: (Centos) add bunkerweb rpm-key
+  rpm_key: 
+    key: https://packagecloud.io/bunkerity/bunkerweb/gpgkey 
+    state: present 
+    fingerprint: 9F5B478F976C7F30191887DCA84F8F37160CA01F
+- name: (Centos) add bunkerweb yum repository
+  yum_repository: 
+    name: bunkerity_bunkerweb
+    description: Bunkerweb repo
+    baseurl: https://packagecloud.io/bunkerity/bunkerweb/el/8/$basearch
+    file: bunkerity_bunkerweb
+    gpgcheck: no
+    state: present 
+- name: (Centos) Install bunkerweb dnf version {{ bunkerweb_version }}
+  dnf:
+    name: "bunkerweb-{{ bunkerweb_version }}"
+    state: present
+- name: (Centos) Prevent bunkerweb from being updated
+  community.general.yum_versionlock:
+    state: present
+    name: "bunkerweb={{ bunkerweb_version }}"
+- name: (Centos) Replace /opt/bunkerweb/variables.env
+  copy:
+    src: "{{ variables_env }}"
+    dest: /opt/bunkerweb/variables.env
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  notify: (Handler) restart bunkerweb
+- name: (Centos) Replace /opt/bunkerweb/ui.env
+  copy:
+    src: "{{ custom_ui }}"
+    dest: /opt/bunkerweb/ui.env
+    owner: root
+    group: root
+    mode: 0644
+    force: yes  
+  notify: (Handler) restart bunkerweb-ui
+- name: (Centos) If var {{enable_ui}} is false, systemctl disable bunkerweb-ui
+  service:
+    name: bunkerweb-ui
+    state: stopped
+    enabled: no
+  when: enable_ui|bool == false
+- name: (Centos) Loop dictionary {{custom_configs_path}} and copy files to /opt/bunkerweb/configs
+  copy:
+    src: "{{ item.value }}"
+    dest: /opt/bunkerweb/configs/
+    owner: root
+    group: nginx
+    mode: 0770
+    force: yes
+  notify: (Handler) restart bunkerweb
+  with_dict: "{{ custom_configs_path }}"
+  when: item.value != None
+- name: (Centos) Add /opt/bunkerweb/www/ with {{custom_www}}
+  copy:
+    src: "{{ custom_www }}"
+    dest: /opt/bunkerweb/www/
+    owner: "{{ custom_www_owner }}"
+    group: "{{ custom_www_group }}"
+    mode: 0640
+    force: yes
+  notify: (Handler) restart bunkerweb
+  when: custom_www|length > 0
+- name: Recursively change permission of folders
+  file:
+    path: /opt/bunkerweb/www/{{custom_www}}
+    state: directory
+    recurse: yes
+    mode: '0750'
+    force: yes
+  notify: (Handler) restart bunkerweb
+  when: custom_www|length > 0
+- name: (Centos) Add /opt/bunkerweb/plugins/ with {{custom_plugins}}
+  copy:
+    src: "{{ item }}"
+    dest: /opt/bunkerweb/custom_plugins/
+    owner: nginx
+    group: nginx
+    mode: 0770
+    force: yes
+  with_fileglob:
+    - "{{ custom_plugins }}/*"
+  when: custom_plugins|length > 0
+  notify: (Handler) restart bunkerweb

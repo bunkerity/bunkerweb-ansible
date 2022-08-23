@@ -1,0 +1,125 @@
+---
+- name: (Debian) Update the package list
+  apt:
+    update_cache: yes
+- name: (Debian) Upgrade the system
+  apt:
+    upgrade: dist
+    update_cache: yes
+- name: (Debian) Install packages "curl gnupg2 ca-certificates lsb-release debian-archive-keyring"
+  apt:
+    pkg: 
+    - curl
+    - gnupg 
+    - gnupg2
+    - ca-certificates
+    - lsb-release
+    - debian-archive-keyring
+    - apt-transport-https
+    state: latest
+- name: (Debian) add nginx apt-key
+  apt_key: 
+    url: https://nginx.org/keys/nginx_signing.key 
+    state: present 
+    id: 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62
+    keyring: /usr/share/keyrings/nginx-archive-keyring.gpg
+- name: (Debian) add nginx apt repository
+  apt_repository: 
+    repo: deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian/ bullseye nginx
+    state: present 
+    filename: nginx 
+    update_cache: yes
+- name: (Debian) Install "nginx={{ nginx_version }}-1~bullseye"
+  apt:
+    name: "nginx={{ nginx_version }}-1~bullseye"
+    state: present
+- name: (Debian) Prevent nginx from being upgraded
+  dpkg_selections:
+    name: nginx
+    selection: hold
+  when: freeze_versions|bool == true
+- name: (Debian) add bunkerweb key
+  apt_key:
+    url: https://packagecloud.io/bunkerity/bunkerweb/gpgkey 
+    state: present 
+    id: 9F5B478F976C7F30191887DCA84F8F37160CA01F
+    keyring: /etc/apt/trusted.gpg.d/bunkerity_bunkerweb-archive-keyring.gpg
+- name: (Debian) add bukerweb apt repository
+  apt_repository: 
+    repo: deb [signed-by=/etc/apt/trusted.gpg.d/bunkerity_bunkerweb-archive-keyring.gpg] https://packagecloud.io/bunkerity/bunkerweb/debian bullseye main
+    state: present 
+    filename: bunkerity_bunkerweb
+- name: (Debian) Install "bunkerweb=1.4.1"
+  apt:
+    name: "bunkerweb={{ bunkerweb_version }}"
+- name: (Debian) Prevent bunkerweb from being upgraded
+  dpkg_selections:
+    name: bunkerweb
+    selection: hold
+  when: freeze_versions|bool == true
+- name: (Debian) Replace /opt/bunkerweb/variables.env
+  copy:
+    src: "{{ variables_env }}"
+    dest: /opt/bunkerweb/variables.env
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  notify: (Handler) restart bunkerweb
+- name: (Debian) Replace /opt/bunkerweb/ui.env
+  copy:
+    src: "{{ custom_ui }}"
+    dest: /opt/bunkerweb/ui.env
+    owner: root
+    group: root
+    mode: 0644
+    force: yes  
+  notify: (Handler) restart bunkerweb-ui
+- name: (Debian) If var {{enable_ui}} is false, systemctl disable bunkerweb-ui
+  service:
+    name: bunkerweb-ui
+    state: stopped
+    enabled: no
+  when: enable_ui|bool == false
+- name: (Debian) Loop dictionary {{custom_configs_path}} and copy files to /opt/bunkerweb/configs 
+  copy:
+    src: "{{ item.value }}"
+    dest: /opt/bunkerweb/configs/
+    owner: root
+    group: nginx
+    mode: 0770
+    force: yes
+  notify: (Handler) restart bunkerweb
+  with_dict: "{{ custom_configs_path }}"
+  when: item.value != None
+- name: (Debian) Add /opt/bunkerweb/www/ with {{custom_www}}
+  copy:
+    src: "{{ custom_www }}"
+    dest: /opt/bunkerweb/www/
+    owner: "{{ custom_www_owner }}"
+    group: "{{ custom_www_group }}"
+    mode: 0640
+    force: yes
+  notify: (Handler) restart bunkerweb
+  when: custom_www|length > 0
+- name: Recursively change permission of folders
+  file:
+    path: /opt/bunkerweb/www/{{custom_www}}
+    state: directory
+    recurse: yes
+    mode: '0750'
+    force: yes
+  notify: (Handler) restart bunkerweb
+  when: custom_www|length > 0
+- name: (Debian) Add /opt/bunkerweb/plugins/ with {{custom_plugins}}
+  copy:
+    src: "{{ item }}"
+    dest: /opt/bunkerweb/custom_plugins/
+    owner: nginx
+    group: nginx
+    mode: 0770
+    force: yes
+  with_fileglob:
+    - "{{ custom_plugins }}/*"
+  when: custom_plugins|length > 0
+  notify: (Handler) restart bunkerweb
