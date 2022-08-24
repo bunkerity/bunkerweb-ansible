@@ -49,7 +49,7 @@
     repo: deb [signed-by=/etc/apt/trusted.gpg.d/bunkerity_bunkerweb-archive-keyring.gpg] https://packagecloud.io/bunkerity/bunkerweb/debian bullseye main
     state: present 
     filename: bunkerity_bunkerweb
-- name: (Debian) Install "bunkerweb=1.4.1"
+- name: (Debian) Install "bunkerweb={{ bunkerweb_version }}"
   apt:
     name: "bunkerweb={{ bunkerweb_version }}"
 - name: (Debian) Prevent bunkerweb from being upgraded
