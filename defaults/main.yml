@@ -1,7 +1,7 @@
 ---
 # Version of bunkerweb.
-# Default: 1.4.2.
-bunkerweb_version: 1.4.2
+# Default: 1.4.3.
+bunkerweb_version: 1.4.3
 
 # Version of nginx.
 # Default: 1.20.2.

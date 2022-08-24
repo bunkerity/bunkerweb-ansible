@@ -113,7 +113,7 @@
 - name: (Ubuntu) Add /opt/bunkerweb/plugins/ with {{custom_plugins}}
   copy:
     src: "{{ item }}"
-    dest: /opt/bunkerweb/custom_plugins/
+    dest: /opt/bunkerweb/plugins/
     owner: nginx
     group: nginx
     mode: 0770

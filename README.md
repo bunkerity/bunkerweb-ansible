@@ -1,38 +1,33 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+Ansible role to install and manage [BunkerWeb](https://docs.bunkerweb.io) on Linux.
+
+See the [documentation](https://docs.bunkerweb.io/1.4/integrations/#ansible) for more information about the role.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+We assume that you are already familiar with both BunkerWeb and Ansible.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
-Example Playbook
-----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+| Name  | Type  | Description  | Default value  |
+|:-----:|:-----:|--------------|----------------|
+| `bunkerweb_version` | string | Version of BunkerWeb to install. | `1.4.3` |
+| `nginx_version` | string | Version of NGINX to install. | `1.20.2` |
+| `freeze_versions` | boolean | Prevent upgrade of BunkerWeb and NGINX when performing packages upgrades. | `true` |
+| `variables_env` | string | Path of the variables.env file to configure BunkerWeb. | `files/variables.env` |
+| `enable_ui` | boolean | Activate the web UI. | `false` |
+| `custom_ui` | string | Path of the ui.env file to configure the web UI. | `files/ui.env` |
+| `custom_configs_path` | Dictionary | Each entry is a path of the folder containing custom configurations. Keys are the type of custom configs : `http`, `server-http`, `modsec`, `modsec-crs` and `default-server-http` | empty values |
+| `custom_www` | string | Path of the www directory to upload. | empty value |
+| `custom_plugins` | string | Path of the plugins directory to upload. | empty value |
+| `custom_www_owner` | string | Default owner for www files and folders. | `nginx` |
+| `custom_www_group` | string | Default group for www files and folders. | `nginx` |
 
 License
 -------
 
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+AGPL v3
