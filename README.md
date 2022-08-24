@@ -1,4 +1,4 @@
-Role Name
+BunkerWeb
 =========
 
 Ansible role to install and manage [BunkerWeb](https://docs.bunkerweb.io) on Linux.
