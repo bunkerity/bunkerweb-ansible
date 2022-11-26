@@ -15,7 +15,7 @@ Role Variables
 
 | Name  | Type  | Description  | Default value  |
 |:-----:|:-----:|--------------|----------------|
-| `bunkerweb_version` | string | Version of BunkerWeb to install. | `1.4.3` |
+| `bunkerweb_version` | string | Version of BunkerWeb to install. | `1.4.5` |
 | `nginx_version` | string | Version of NGINX to install. | `1.20.2` |
 | `freeze_versions` | boolean | Prevent upgrade of BunkerWeb and NGINX when performing packages upgrades. | `true` |
 | `variables_env` | string | Path of the variables.env file to configure BunkerWeb. | `files/variables.env` |
