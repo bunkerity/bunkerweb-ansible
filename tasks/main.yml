@@ -12,3 +12,6 @@
 - name: Fedora
   include_tasks: tasks/fedora.yml
   when: ansible_facts['distribution'] == 'Fedora'
+- name: RedHat
+  include_tasks: tasks/redhat.yml
+  when: ansible_facts['distribution'] == 'RedHat'

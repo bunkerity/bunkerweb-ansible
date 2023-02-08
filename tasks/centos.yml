@@ -48,19 +48,19 @@
   community.general.yum_versionlock:
     state: present
     name: "bunkerweb={{ bunkerweb_version }}"
-- name: (Centos) Replace /opt/bunkerweb/variables.env
+- name: (Centos) Replace /usr/share/bunkerweb/variables.env
   copy:
     src: "{{ variables_env }}"
-    dest: /opt/bunkerweb/variables.env
+    dest: /usr/share/bunkerweb/variables.env
     owner: root
     group: root
     mode: 0644
     force: yes
   notify: (Handler) restart bunkerweb
-- name: (Centos) Replace /opt/bunkerweb/ui.env
+- name: (Centos) Replace /usr/share/bunkerweb/ui.env
   copy:
     src: "{{ custom_ui }}"
-    dest: /opt/bunkerweb/ui.env
+    dest: /usr/share/bunkerweb/ui.env
     owner: root
     group: root
     mode: 0644
@@ -72,10 +72,10 @@
     state: stopped
     enabled: no
   when: enable_ui|bool == false
-- name: (Centos) Loop dictionary {{custom_configs_path}} and copy files to /opt/bunkerweb/configs
+- name: (Centos) Loop dictionary {{custom_configs_path}} and copy files to /usr/share/bunkerweb/configs
   copy:
     src: "{{ item.value }}"
-    dest: /opt/bunkerweb/configs/
+    dest: /usr/share/bunkerweb/configs/
     owner: root
     group: nginx
     mode: 0770
@@ -83,10 +83,10 @@
   notify: (Handler) restart bunkerweb
   with_dict: "{{ custom_configs_path }}"
   when: item.value != None
-- name: (Centos) Add /opt/bunkerweb/www/ with {{custom_www}}
+- name: (Centos) Add /usr/share/bunkerweb/www/ with {{custom_www}}
   copy:
     src: "{{ custom_www }}"
-    dest: /opt/bunkerweb/www/
+    dest: /usr/share/bunkerweb/www/
     owner: "{{ custom_www_owner }}"
     group: "{{ custom_www_group }}"
     mode: 0640
@@ -95,17 +95,17 @@
   when: custom_www|length > 0
 - name: Recursively change permission of folders
   file:
-    path: /opt/bunkerweb/www/{{custom_www}}
+    path: /usr/share/bunkerweb/www/{{custom_www}}
     state: directory
     recurse: yes
     mode: '0750'
     force: yes
   notify: (Handler) restart bunkerweb
   when: custom_www|length > 0
-- name: (Centos) Add /opt/bunkerweb/plugins/ with {{custom_plugins}}
+- name: (Centos) Add /usr/share/bunkerweb/plugins/ with {{custom_plugins}}
   copy:
     src: "{{ item }}"
-    dest: /opt/bunkerweb/plugins/
+    dest: /usr/share/bunkerweb/plugins/
     owner: nginx
     group: nginx
     mode: 0770
