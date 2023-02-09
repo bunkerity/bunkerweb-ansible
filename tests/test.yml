@@ -1,5 +1,9 @@
 ---
-- hosts: localhost
-  remote_user: root
-  roles:
-    - bunkerweb
+- name: Test Task Selection
+  hosts: all
+  vars_files:
+    - ../defaults/main.yml
+  tasks:
+    - name: Debian
+      include_tasks: ../tasks/centos.yml
+      when: ansible_facts['distribution'] == 'CentOS'

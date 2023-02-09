@@ -38,43 +38,48 @@
     name: nginx
     selection: hold
   when: freeze_versions|bool == true
-- name: (Debian) add bunkerweb key
-  apt_key:
-    url: https://packagecloud.io/bunkerity/bunkerweb/gpgkey 
-    state: present 
-    id: 9F5B478F976C7F30191887DCA84F8F37160CA01F
-    keyring: /etc/apt/trusted.gpg.d/bunkerity_bunkerweb-archive-keyring.gpg
-- name: (Debian) add bukerweb apt repository
-  apt_repository: 
-    repo: deb [signed-by=/etc/apt/trusted.gpg.d/bunkerity_bunkerweb-archive-keyring.gpg] https://packagecloud.io/bunkerity/bunkerweb/debian bullseye main
-    state: present 
-    filename: bunkerity_bunkerweb
-- name: (Debian) Install "bunkerweb={{ bunkerweb_version }}"
-  apt:
-    name: "bunkerweb={{ bunkerweb_version }}"
+  # FOR FINAL RELEASE, UNCOMMENT THE FOLLOWING TASKS
+# - name: (Debian) add bunkerweb key
+#   apt_key:
+#     url: https://packagecloud.io/bunkerity/bunkerweb/gpgkey 
+#     state: present 
+#     id: 9F5B478F976C7F30191887DCA84F8F37160CA01F
+#     keyring: /etc/apt/trusted.gpg.d/bunkerity_bunkerweb-archive-keyring.gpg
+# - name: (Debian) add bukerweb apt repository
+#   apt_repository: 
+#     repo: deb [signed-by=/etc/apt/trusted.gpg.d/bunkerity_bunkerweb-archive-keyring.gpg] https://packagecloud.io/bunkerity/bunkerweb/debian bullseye main
+#     state: present 
+#     filename: bunkerity_bunkerweb
+# - name: (Debian) Install "bunkerweb={{ bunkerweb_version }}"
+#   apt:
+#     name: "bunkerweb={{ bunkerweb_version }}"
+  # INSTRUCTIONS FOR TESTING, REMOVE THE TASKS WHEN DONE
+- name: (Debian) Install from /data/bunkerweb.deb
+  command: apt install -y /data/bunkerweb.deb
 - name: (Debian) Prevent bunkerweb from being upgraded
   dpkg_selections:
     name: bunkerweb
     selection: hold
   when: freeze_versions|bool == true
-- name: (Debian) Replace /usr/share/bunkerweb/variables.env
-  copy:
-    src: "{{ variables_env }}"
-    dest: /usr/share/bunkerweb/variables.env
-    owner: root
-    group: root
-    mode: 0644
-    force: yes
-  notify: (Handler) restart bunkerweb
-- name: (Debian) Replace /usr/share/bunkerweb/ui.env
-  copy:
-    src: "{{ custom_ui }}"
-    dest: /usr/share/bunkerweb/ui.env
-    owner: root
-    group: root
-    mode: 0644
-    force: yes  
-  notify: (Handler) restart bunkerweb-ui
+  # Wi'LL SEE 
+# - name: (Debian) Replace /usr/share/bunkerweb/variables.env
+#   copy:
+#     src: "{{ variables_env }}"
+#     dest: /usr/share/bunkerweb/variables.env
+#     owner: root
+#     group: root
+#     mode: 0644
+#     force: yes
+#   notify: (Handler) restart bunkerweb
+# - name: (Debian) Replace /usr/share/bunkerweb/ui.env
+#   copy:
+#     src: "{{ custom_ui }}"
+#     dest: /usr/share/bunkerweb/ui.env
+#     owner: root
+#     group: root
+#     mode: 0644
+#     force: yes  
+#   notify: (Handler) restart bunkerweb-ui
 - name: (Debian) If var {{enable_ui}} is false, systemctl disable bunkerweb-ui
   service:
     name: bunkerweb-ui

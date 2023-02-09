@@ -15,45 +15,50 @@
   community.general.yum_versionlock:
     state: present
     name: "nginx-{{ nginx_version }}"
-- name: (Fedora) add bunkerweb rpm-key
-  rpm_key: 
-    key: https://packagecloud.io/bunkerity/bunkerweb/gpgkey 
-    state: present 
-    fingerprint: 9F5B478F976C7F30191887DCA84F8F37160CA01F
-- name: (Fedora) add bunkerweb yum repository
-  yum_repository: 
-    name: bunkerity_bunkerweb
-    description: Bunkerweb repo
-    baseurl: https://packagecloud.io/bunkerity/bunkerweb/fedora/36/$basearch
-    file: bunkerity_bunkerweb
-    gpgcheck: no
-    state: present 
-- name: (Fedora) Install bunkerweb dnf version {{ bunkerweb_version }}
-  dnf:
-    name: "bunkerweb-{{ bunkerweb_version }}"
-    state: present
+  # FOR FINAL RELEASE, UNCOMMENT THE FOLLOWING TASKS
+# - name: (Fedora) add bunkerweb rpm-key
+#   rpm_key: 
+#     key: https://packagecloud.io/bunkerity/bunkerweb/gpgkey 
+#     state: present 
+#     fingerprint: 9F5B478F976C7F30191887DCA84F8F37160CA01F
+# - name: (Fedora) add bunkerweb yum repository
+#   yum_repository: 
+#     name: bunkerity_bunkerweb
+#     description: Bunkerweb repo
+#     baseurl: https://packagecloud.io/bunkerity/bunkerweb/fedora/36/$basearch
+#     file: bunkerity_bunkerweb
+#     gpgcheck: no
+#     state: present 
+# - name: (Fedora) Install bunkerweb dnf version {{ bunkerweb_version }}
+#   dnf:
+#     name: "bunkerweb-{{ bunkerweb_version }}"
+#     state: present
+  # INSTRUCTIONS FOR TESTING, REMOVE THE TASKS WHEN DONE
+- name: (Fedora) Install from /data/bunkerweb.rpm
+  command: dnf install -y /data/bunkerweb.rpm
 - name: (Fedora) Prevent bunkerweb from being updated
   community.general.yum_versionlock:
     state: present
     name: "bunkerweb={{ bunkerweb_version }}"
-- name: (Fedora) Replace /usr/share/bunkerweb/variables.env
-  copy:
-    src: "{{ variables_env }}"
-    dest: /usr/share/bunkerweb/variables.env
-    owner: root
-    group: root
-    mode: 0644
-    force: yes
-  notify: (Handler) restart bunkerweb
-- name: (Fedora) Replace /usr/share/bunkerweb/ui.env
-  copy:
-    src: "{{ custom_ui }}"
-    dest: /usr/share/bunkerweb/ui.env
-    owner: root
-    group: root
-    mode: 0644
-    force: yes  
-  notify: (Handler) restart bunkerweb-ui
+  # WE'LL SEE
+# - name: (Fedora) Replace /usr/share/bunkerweb/variables.env
+#   copy:
+#     src: "{{ variables_env }}"
+#     dest: /usr/share/bunkerweb/variables.env
+#     owner: root
+#     group: root
+#     mode: 0644
+#     force: yes
+#   notify: (Handler) restart bunkerweb
+# - name: (Fedora) Replace /usr/share/bunkerweb/ui.env
+#   copy:
+#     src: "{{ custom_ui }}"
+#     dest: /usr/share/bunkerweb/ui.env
+#     owner: root
+#     group: root
+#     mode: 0644
+#     force: yes  
+#   notify: (Handler) restart bunkerweb-ui
 - name: (Fedora) If var {{enable_ui}} is false, systemctl disable bunkerweb-ui
   service:
     name: bunkerweb-ui

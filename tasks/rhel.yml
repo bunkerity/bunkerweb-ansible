@@ -1,5 +1,5 @@
 ---
-- name: (Centos) Copy ../files/nginx.repo to /etc/yum.repos.d/nginx.repo
+- name: (Rhel) Copy ../files/nginx.repo to /etc/yum.repos.d/nginx.repo
   copy:
     src: ../files/nginx.repo
     dest: /etc/yum.repos.d/nginx.repo
@@ -7,29 +7,29 @@
     group: root
     mode: 0644
     force: yes
-- name: (Centos) Install epel-release dnf
+- name: (Rhel) Install epel-release dnf
   dnf:
     name: "epel-release"
     state: present
-- name: (Centos) Install nginx dnf version {{ nginx_version }}
+- name: (Rhel) Install nginx dnf version {{ nginx_version }}
   dnf:
     name: "nginx-{{ nginx_version }}"
     state: present
-- name: (Centos) Install python3-dnf-plugin-versionlock
+- name: (Rhel) Install python3-dnf-plugin-versionlock
   dnf:
     name: "python3-dnf-plugin-versionlock"
     state: present
-- name: (Centos) Prevent nginx from being updated
+- name: (Rhel) Prevent nginx from being updated
   community.general.yum_versionlock:
     state: present
     name: "nginx-{{ nginx_version }}"
 # FOR FINAL RELEASE, UNCOMMENT THE FOLLOWING TASKS
-# - name: (Centos) add bunkerweb rpm-key
+# - name: (Rhel) add bunkerweb rpm-key
 #   rpm_key: 
 #     key: https://packagecloud.io/bunkerity/bunkerweb/gpgkey 
 #     state: present 
 #     fingerprint: 9F5B478F976C7F30191887DCA84F8F37160CA01F
-# - name: (Centos) add bunkerweb yum repository
+# - name: (Rhel) add bunkerweb yum repository
 #   yum_repository: 
 #     name: bunkerity_bunkerweb
 #     description: Bunkerweb repo
@@ -37,19 +37,19 @@
 #     file: bunkerity_bunkerweb
 #     gpgcheck: no
 #     state: present 
-# - name: (Centos) Install bunkerweb dnf version {{ bunkerweb_version }}
+# - name: (Rhel) Install bunkerweb dnf version {{ bunkerweb_version }}
 #   dnf:
 #     name: "bunkerweb-{{ bunkerweb_version }}"
 #     state: present
   # INSTRUCTIONS FOR TESTING, REMOVE THE TASKS WHEN DONE
-- name: (Centos) Install from /data/bunkerweb.rpm
+- name: (Rhel) Install from /data/bunkerweb.rpm
   command: dnf install -y /data/bunkerweb.rpm
-- name: (Centos) Prevent bunkerweb from being updated
+- name: (Rhel) Prevent bunkerweb from being updated
   community.general.yum_versionlock:
     state: present
     name: "bunkerweb={{ bunkerweb_version }}"
   # WE'LL SEE
-# - name: (Centos) Replace /usr/share/bunkerweb/variables.env
+# - name: (Rhel) Replace /usr/share/bunkerweb/variables.env
 #   copy:
 #     src: "{{ variables_env }}"
 #     dest: /usr/share/bunkerweb/variables.env
@@ -58,7 +58,7 @@
 #     mode: 0644
 #     force: yes
 #   notify: (Handler) restart bunkerweb
-# - name: (Centos) Replace /usr/share/bunkerweb/ui.env
+# - name: (Rhel) Replace /usr/share/bunkerweb/ui.env
 #   copy:
 #     src: "{{ custom_ui }}"
 #     dest: /usr/share/bunkerweb/ui.env
@@ -67,13 +67,13 @@
 #     mode: 0644
 #     force: yes  
 #   notify: (Handler) restart bunkerweb-ui
-- name: (Centos) If var {{enable_ui}} is false, systemctl disable bunkerweb-ui
+- name: (Rhel) If var {{enable_ui}} is false, systemctl disable bunkerweb-ui
   service:
     name: bunkerweb-ui
     state: stopped
     enabled: no
   when: enable_ui|bool == false
-- name: (Centos) Loop dictionary {{custom_configs_path}} and copy files to /usr/share/bunkerweb/configs
+- name: (Rhel) Loop dictionary {{custom_configs_path}} and copy files to /usr/share/bunkerweb/configs
   copy:
     src: "{{ item.value }}"
     dest: /usr/share/bunkerweb/configs/
@@ -84,7 +84,7 @@
   notify: (Handler) restart bunkerweb
   with_dict: "{{ custom_configs_path }}"
   when: item.value != None
-- name: (Centos) Add /usr/share/bunkerweb/www/ with {{custom_www}}
+- name: (Rhel) Add /usr/share/bunkerweb/www/ with {{custom_www}}
   copy:
     src: "{{ custom_www }}"
     dest: /usr/share/bunkerweb/www/
@@ -103,7 +103,7 @@
     force: yes
   notify: (Handler) restart bunkerweb
   when: custom_www|length > 0
-- name: (Centos) Add /usr/share/bunkerweb/plugins/ with {{custom_plugins}}
+- name: (Rhel) Add /usr/share/bunkerweb/plugins/ with {{custom_plugins}}
   copy:
     src: "{{ item }}"
     dest: /usr/share/bunkerweb/plugins/
