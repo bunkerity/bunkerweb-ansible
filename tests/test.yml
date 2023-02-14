@@ -1,9 +1,5 @@
 ---
-- name: Test Task Selection
-  hosts: all
-  vars_files:
-    - ../defaults/main.yml
-  tasks:
-    - name: RedHat
-      include_tasks: ../tasks/redhat.yml
-      when: ansible_facts['distribution'] == 'RedHat'
+- hosts: localhost
+  remote_user: root
+  roles:
+    - bunkerweb

@@ -15,7 +15,7 @@ freeze_versions: true
 
 # Used to activate the Bunkerweb ui .
 # Default: false.
-enable_ui: true
+enable_ui: false
 
 # Customize the file ui.env
 # By default it will be copied from the files/variables.env withing the role.

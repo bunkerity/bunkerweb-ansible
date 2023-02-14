@@ -2,16 +2,16 @@
 # tasks file for bunkerweb
 - name: Debian
   include_tasks: tasks/debian.yml
-  when: ansible_facts['distribution'] == 'Debian'
+  when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "11")
 - name: Ubuntu
   include_tasks: tasks/ubuntu.yml
-  when: ansible_facts['distribution'] == 'Ubuntu'
+  when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] == "22.04") 
 - name: CentOS
   include_tasks: tasks/centos.yml
   when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "8") 
 - name: Fedora
   include_tasks: tasks/fedora.yml
-  when: ansible_facts['distribution'] == 'Fedora'
+  when: (ansible_facts['distribution'] == "Fedora" and ansible_facts['distribution_major_version'] == "37") 
 - name: RedHat
   include_tasks: tasks/redhat.yml
-  when: ansible_facts['distribution'] == 'RedHat'
+  when: (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "8")
