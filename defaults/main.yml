@@ -4,7 +4,7 @@
 bunkerweb_version: 1.5
 
 # Version of nginx.
-# Default: 1.22.2.
+# Default: 1.22.1.
 nginx_version: 1.22.1
 
 # Used to not upgrade Bunkerweb and Nginx after a "apt-get upgrade".
@@ -15,17 +15,17 @@ freeze_versions: true
 
 # Used to activate the Bunkerweb ui .
 # Default: false.
-enable_ui: false
+enable_ui: true
 
 # Customize the file ui.env
 # By default it will be copied from the files/variables.env withing the role.
 # To overwrite it, set the path to the file.
-custom_ui: files/ui.env
+custom_ui: ../files/ui.env
 
 # Customize the file variables.env.
 # By default it will be copied from the files/variables.env within the role.
 # To overwrite it, set this and provide the path to your file.
-variables_env: files/variables.env
+variables_env: ../files/variables.env
 
 # All types of custom configs.
 # http: https://docs.bunkerweb.io/1.4/quickstart-guide/#custom-configurations

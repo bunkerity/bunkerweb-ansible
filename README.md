@@ -1,9 +1,6 @@
 BunkerWeb
 =========
 
-# Testing:
-ansible-playbook --connection=local -i /ansible/tests/inventory /ansible/tests/test.yml
-
 Ansible role to install and manage [BunkerWeb](https://docs.bunkerweb.io) on Linux.
 
 See the [documentation](https://docs.bunkerweb.io/1.4/integrations/#ansible) for more information about the role.

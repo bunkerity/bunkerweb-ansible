@@ -40,25 +40,24 @@
   community.general.yum_versionlock:
     state: present
     name: "bunkerweb={{ bunkerweb_version }}"
-  # WE'LL SEE
-# - name: (Fedora) Replace /usr/share/bunkerweb/variables.env
-#   copy:
-#     src: "{{ variables_env }}"
-#     dest: /usr/share/bunkerweb/variables.env
-#     owner: root
-#     group: root
-#     mode: 0644
-#     force: yes
-#   notify: (Handler) restart bunkerweb
-# - name: (Fedora) Replace /usr/share/bunkerweb/ui.env
-#   copy:
-#     src: "{{ custom_ui }}"
-#     dest: /usr/share/bunkerweb/ui.env
-#     owner: root
-#     group: root
-#     mode: 0644
-#     force: yes  
-#   notify: (Handler) restart bunkerweb-ui
+- name: (Fedora) Replace /etc/bunkerweb/variables.env
+  copy:
+    src: "{{ variables_env }}"
+    dest: /etc/bunkerweb/variables.env
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  notify: (Handler) restart bunkerweb
+- name: (Fedora) Replace /etc/bunkerweb/ui.env
+  copy:
+    src: "{{ custom_ui }}"
+    dest: /etc/bunkerweb/ui.env
+    owner: root
+    group: root
+    mode: 0644
+    force: yes  
+  notify: (Handler) restart bunkerweb-ui
 - name: (Fedora) If var {{enable_ui}} is false, systemctl disable bunkerweb-ui
   service:
     name: bunkerweb-ui
