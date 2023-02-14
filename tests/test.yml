@@ -4,6 +4,6 @@
   vars_files:
     - ../defaults/main.yml
   tasks:
-    - name: Debian
-      include_tasks: ../tasks/centos.yml
-      when: ansible_facts['distribution'] == 'CentOS'
+    - name: RedHat
+      include_tasks: ../tasks/redhat.yml
+      when: ansible_facts['distribution'] == 'RedHat'

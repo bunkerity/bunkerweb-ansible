@@ -1,16 +1,27 @@
 ---
 - name: (Rhel) Copy ../files/nginx.repo to /etc/yum.repos.d/nginx.repo
   copy:
-    src: ../files/nginx.repo
-    dest: /etc/yum.repos.d/nginx.repo
+    src: ../files/centos.repo
+    dest: /etc/yum.repos.d/centos.repo
     owner: root
     group: root
     mode: 0644
     force: yes
+- name: (Rhel) Copy ../RPM-GPG-KEY to /etc/pki/rpm-gpg/RPM-GPG-KEY
+  copy:
+    src: ../files/RPM-GPG-KEY-centosofficial
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+- name: (Rhel) Wget epel-release rpm
+  get_url:
+    url: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    dest: /tmp/epel-release-latest-8.noarch.rpm
+    mode: 0644
 - name: (Rhel) Install epel-release dnf
-  dnf:
-    name: "epel-release"
-    state: present
+  command: rpm -Uvh /tmp/epel-release-latest-8.noarch.rpm
 - name: (Rhel) Install nginx dnf version {{ nginx_version }}
   dnf:
     name: "nginx-{{ nginx_version }}"

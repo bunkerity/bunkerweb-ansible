@@ -8,10 +8,10 @@
   when: ansible_facts['distribution'] == 'Ubuntu'
 - name: CentOS
   include_tasks: tasks/centos.yml
-  when: ansible_facts['distribution'] == 'CentOS'
+  when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "8") 
 - name: Fedora
   include_tasks: tasks/fedora.yml
   when: ansible_facts['distribution'] == 'Fedora'
 - name: RedHat
-  include_tasks: tasks/rhel.yml
-  when: ansible_facts['distribution'] == 'Rhel'
+  include_tasks: tasks/redhat.yml
+  when: ansible_facts['distribution'] == 'RedHat'
