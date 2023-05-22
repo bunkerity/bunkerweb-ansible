@@ -1,11 +1,11 @@
 ---
 # Version of bunkerweb.
-# Default: 1.5.
-bunkerweb_version: 1.5
+# Default: 1.5.0.
+bunkerweb_version: 1.5.0
 
 # Version of nginx.
-# Default: 1.22.1.
-nginx_version: 1.22.1
+# Default: 1.24.0
+nginx_version: 1.24.0
 
 # Used to not upgrade Bunkerweb and Nginx after a "apt-get upgrade".
 # There is no reason to touch it unless you know what you are doing.

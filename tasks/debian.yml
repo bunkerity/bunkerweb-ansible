@@ -45,7 +45,7 @@
 #     state: present 
 #     id: 9F5B478F976C7F30191887DCA84F8F37160CA01F
 #     keyring: /etc/apt/trusted.gpg.d/bunkerity_bunkerweb-archive-keyring.gpg
-# - name: (Debian) add bukerweb apt repository
+# - name: (Debian) add bukerweb apt repositoryupgraded
 #   apt_repository: 
 #     repo: deb [signed-by=/etc/apt/trusted.gpg.d/bunkerity_bunkerweb-archive-keyring.gpg] https://packagecloud.io/bunkerity/bunkerweb/debian bullseye main
 #     state: present 
@@ -85,10 +85,10 @@
     state: stopped
     enabled: no
   when: enable_ui|bool == false
-- name: (Debian) Loop dictionary {{custom_configs_path}} and copy files to /usr/share/bunkerweb/configs 
+- name: (Debian) Loop dictionary {{custom_configs_path}} and copy files to /etc/bunkerweb/configs 
   copy:
     src: "{{ item.value }}"
-    dest: /usr/share/bunkerweb/configs/
+    dest: /etc/bunkerweb/configs/
     owner: root
     group: nginx
     mode: 0770
@@ -96,10 +96,10 @@
   notify: (Handler) restart bunkerweb
   with_dict: "{{ custom_configs_path }}"
   when: item.value != None
-- name: (Debian) Add /usr/share/bunkerweb/www/ with {{custom_www}}
+- name: (Debian) Add /var/www/html with {{custom_www}}
   copy:
     src: "{{ custom_www }}"
-    dest: /usr/share/bunkerweb/www/
+    dest: /var/www/html/www/
     owner: "{{ custom_www_owner }}"
     group: "{{ custom_www_group }}"
     mode: 0640
@@ -108,17 +108,17 @@
   when: custom_www|length > 0
 - name: Recursively change permission of folders
   file:
-    path: /usr/share/bunkerweb/www/{{custom_www}}
+    path: /var/www/html/{{custom_www}}
     state: directory
     recurse: yes
     mode: '0750'
     force: yes
   notify: (Handler) restart bunkerweb
   when: custom_www|length > 0
-- name: (Debian) Add /usr/share/bunkerweb/plugins/ with {{custom_plugins}}
+- name: (Debian) Add /etc/bunkerweb/plugins/ with {{custom_plugins}}
   copy:
     src: "{{ item }}"
-    dest: /usr/share/bunkerweb/plugins/
+    dest: /etc/bunkerweb/plugins/
     owner: nginx
     group: nginx
     mode: 0770

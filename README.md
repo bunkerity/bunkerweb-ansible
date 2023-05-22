@@ -3,7 +3,7 @@ BunkerWeb
 
 Ansible role to install and manage [BunkerWeb](https://docs.bunkerweb.io) on Linux.
 
-See the [documentation](https://docs.bunkerweb.io/1.4/integrations/#ansible) for more information about the role.
+See the [documentation](https://docs.bunkerweb.io/1.5.0/integrations/#ansible) for more information about the role.
 
 Requirements
 ------------
@@ -15,8 +15,8 @@ Role Variables
 
 | Name  | Type  | Description  | Default value  |
 |:-----:|:-----:|--------------|----------------|
-| `bunkerweb_version` | string | Version of BunkerWeb to install. | `1.4.5` |
-| `nginx_version` | string | Version of NGINX to install. | `1.20.2` |
+| `bunkerweb_version` | string | Version of BunkerWeb to install. | `1.5.0` |
+| `nginx_version` | string | Version of NGINX to install. | `1.24.0` |
 | `freeze_versions` | boolean | Prevent upgrade of BunkerWeb and NGINX when performing packages upgrades. | `true` |
 | `variables_env` | string | Path of the variables.env file to configure BunkerWeb. | `files/variables.env` |
 | `enable_ui` | boolean | Activate the web UI. | `false` |
