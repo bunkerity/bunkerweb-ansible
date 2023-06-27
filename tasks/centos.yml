@@ -50,7 +50,7 @@
 
 - name: Ephemeral task, Remove existing bunkerweb package
   ansible.builtin.file:
-    path: "/path/to/save/bunkerweb.rpm"
+    path: "/tmp/bunkerweb-1.5.0-1.x86_64.rpm"
     state: absent
 
 - name: Ephemeral task, remove dor final Release Download bunkerweb package
