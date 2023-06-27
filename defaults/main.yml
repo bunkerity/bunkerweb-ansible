@@ -13,6 +13,11 @@ nginx_version: 1.24.0
 # Default: true
 freeze_versions: true
 
+# Used for dnf/yum-versionlock. 
+# In combination with the tag 'versionlock' youre able to just disable the versionlocks.
+version_lock_state: present
+
+
 # Used to activate the Bunkerweb ui .
 # Default: false.
 enable_ui: true

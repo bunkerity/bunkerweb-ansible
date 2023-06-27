@@ -1,6 +1,6 @@
 ---
 - name: (Centos) Copy ../files/nginx.repo to /etc/yum.repos.d/nginx.repo
-  copy:
+  ansible.builtin.copy:
     src: ../files/nginx.repo
     dest: /etc/yum.repos.d/nginx.repo
     owner: root
@@ -8,48 +8,72 @@
     mode: 0644
     force: yes
 - name: (Centos) Install epel-release dnf
-  dnf:
+  ansible.builtin.dnf:
     name: "epel-release"
     state: present
 - name: (Centos) Install nginx dnf version {{ nginx_version }}
-  dnf:
+  ansible.builtin.dnf:
     name: "nginx-{{ nginx_version }}"
     state: present
 - name: (Centos) Install python3-dnf-plugin-versionlock
-  dnf:
+  ansible.builtin.dnf:
     name: "python3-dnf-plugin-versionlock"
-    state: present
+    state: "{{ version_lock_state }}"
+  tags: versionlock
 - name: (Centos) Prevent nginx from being updated
-  community.general.yum_versionlock:
+  community.general.dnf_versionlock:
     state: present
-    name: "nginx-{{ nginx_version }}"
+    name: "{{ version_lock_state }}"
+  tags: versionlock
+  
 # FOR FINAL RELEASE, UNCOMMENT THE FOLLOWING TASKS
 # - name: (Centos) add bunkerweb rpm-key
-#   rpm_key: 
+#   ansible.builtin.rpm_key: 
 #     key: https://packagecloud.io/bunkerity/bunkerweb/gpgkey 
 #     state: present 
 #     fingerprint: 9F5B478F976C7F30191887DCA84F8F37160CA01F
 # - name: (Centos) add bunkerweb yum repository
-#   yum_repository: 
+#   ansible.builtin.yum_repository: 
 #     name: bunkerity_bunkerweb
 #     description: Bunkerweb repo
 #     baseurl: https://packagecloud.io/bunkerity/bunkerweb/el/8/$basearch
 #     file: bunkerity_bunkerweb
 #     gpgcheck: no
+#     repo_gpgcheck: true
+#     gpgkey: https://packagecloud.io/bunkerity/bunkerweb/gpgkey
 #     state: present 
 # - name: (Centos) Install bunkerweb dnf version {{ bunkerweb_version }}
-#   dnf:
+#   ansible.builtin.dnf:
 #     name: "bunkerweb-{{ bunkerweb_version }}"
 #     state: present
   # INSTRUCTIONS FOR TESTING, REMOVE THE TASKS WHEN DONE
-- name: (Centos) Install from /data/bunkerweb.rpm
-  command: dnf install -y /data/bunkerweb.rpm
+
+- name: Ephemeral task, Remove existing bunkerweb package
+  ansible.builtin.file:
+    path: "/path/to/save/bunkerweb.rpm"
+    state: absent
+
+- name: Ephemeral task, remove dor final Release Download bunkerweb package
+  ansible.builtin.uri:
+    url: "https://packagecloud.io/bunkerity/bunkerweb/packages/el/8/bunkerweb-1.5.0-1.x86_64.rpm/download.rpm?distro_version_id=205"
+    dest: "/tmp/bunkerweb-1.5.0-1.x86_64.rpm"
+    mode: '0644'
+    return_content: no
+    validate_certs: yes
+    timeout: 30
+  when: bunkerweb_version in ["1.5.0-1", "1.5.0"]
+  
+- name: (Rhel) Install from /tmp/bunkerweb.rpm
+  command: dnf install -y /tmp/bunkerweb.rpm
+  
 - name: (Centos) Prevent bunkerweb from being updated
-  community.general.yum_versionlock:
-    state: present
+  community.general.dnf_versionlock:
+    state: "{{ version_lock_state }}"
     name: "bunkerweb={{ bunkerweb_version }}"
+  tags: versionlock
+
 - name: (Centos) Replace /etc/bunkerweb/variables.env
-  copy:
+  ansible.builtin.copy:
     src: "{{ variables_env }}"
     dest: /etc/bunkerweb/variables.env
     owner: root
@@ -58,7 +82,7 @@
     force: yes
   notify: (Handler) restart bunkerweb
 - name: (Centos) Replace /etc/bunkerweb/ui.env
-  copy:
+  ansible.builtin.copy:
     src: "{{ custom_ui }}"
     dest: /etc/bunkerweb/ui.env
     owner: root
@@ -67,13 +91,13 @@
     force: yes  
   notify: (Handler) restart bunkerweb-ui
 - name: (Centos) If var {{enable_ui}} is false, systemctl disable bunkerweb-ui
-  service:
+  ansible.builtin.service:
     name: bunkerweb-ui
     state: stopped
     enabled: no
   when: enable_ui|bool == false
 - name: (Centos) Loop dictionary {{custom_configs_path}} and copy files to /etc/bunkerweb/configs
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.value }}"
     dest: /etc/bunkerweb/configs/
     owner: root
@@ -84,7 +108,7 @@
   with_dict: "{{ custom_configs_path }}"
   when: item.value != None
 - name: (Centos) Add /var/www/html with {{custom_www}}
-  copy:
+  ansible.builtin.copy:
     src: "{{ custom_www }}"
     dest: /var/www/html/
     owner: "{{ custom_www_owner }}"
@@ -94,7 +118,7 @@
   notify: (Handler) restart bunkerweb
   when: custom_www|length > 0
 - name: Recursively change permission of folders
-  file:
+  ansible.builtin.file:
     path: /var/www/html/www/{{custom_www}}
     state: directory
     recurse: yes
@@ -103,7 +127,7 @@
   notify: (Handler) restart bunkerweb
   when: custom_www|length > 0
 - name: (Centos) Add /etc/bunkerweb/plugins/ with {{custom_plugins}}
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: /etc/bunkerweb/plugins/
     owner: nginx
