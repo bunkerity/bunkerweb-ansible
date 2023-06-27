@@ -20,11 +20,13 @@
     name: "python3-dnf-plugin-versionlock"
     state: "{{ version_lock_state }}"
   tags: versionlock
+  when: freeze_versions|bool == true
 - name: (Centos) Prevent nginx from being updated
   community.general.dnf_versionlock:
     state: present
     name: "{{ version_lock_state }}"
   tags: versionlock
+  when: freeze_versions|bool == true
   
 # FOR FINAL RELEASE, UNCOMMENT THE FOLLOWING TASKS
 # - name: (Centos) add bunkerweb rpm-key
@@ -70,6 +72,7 @@
   community.general.dnf_versionlock:
     state: "{{ version_lock_state }}"
     name: "bunkerweb={{ bunkerweb_version }}"
+  when: freeze_versions|bool == true
   tags: versionlock
 
 - name: (Centos) Replace /etc/bunkerweb/variables.env
