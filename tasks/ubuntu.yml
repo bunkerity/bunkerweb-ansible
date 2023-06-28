@@ -1,13 +1,13 @@
 ---
 - name: (Ubuntu) Update the package list
-  apt:
+  ansible.builtin.apt:
     update_cache: yes
 - name: (Ubuntu) Upgrade the system
-  apt:
+  ansible.builtin.apt:
     upgrade: dist
     update_cache: yes
 - name: (Ubuntu) Install packages "curl gnupg2 ca-certificates lsb-release debian-archive-keyring"
-  apt:
+  ansible.builtin.apt:
     pkg: 
     - curl
     - gnupg2
@@ -17,26 +17,27 @@
     - apt-transport-https
     state: latest
 - name: (Ubuntu) add nginx apt-key
-  apt_key: 
+  ansible.builtin.apt_key: 
     url: http://nginx.org/keys/nginx_signing.key 
     state: present 
     id: 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62
     keyring: /usr/share/keyrings/nginx-archive-keyring.gpg
 - name: (Ubuntu) add nginx apt repository
-  apt_repository: 
+  ansible.builtin.apt_repository: 
     repo: 'deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ jammy nginx' 
     state: present 
     filename: nginx 
     update_cache: yes
 - name: (Ubuntu) Install "nginx={{ nginx_version }}-1~jammy"
-  apt:
+  ansible.builtin.apt:
     name: "nginx={{ nginx_version }}-1~jammy"
     state: present
 - name: (Ubuntu) Prevent nginx from being upgraded
-  dpkg_selections:
+  ansible.builtin.dpkg_selections:
     name: nginx
-    selection: hold
+    selection: "{{ 'hold' if versionlock else 'install' }}"
   when: freeze_versions|bool == true
+  tags: versionlock
   # FOR FINAL RELEASE, UNCOMMENT THE FOLLOWING TASKS
 # - name: (Ubuntu) add bunkerweb apt-key
 #   apt_key: 
@@ -54,14 +55,15 @@
 #     name: "bunkerweb={{ bunkerweb_version }}"
   # INSTRUCTIONS FOR TESTING, REMOVE THE TASKS WHEN DONE
 - name: (Ubuntu) Install from /data/bunkerweb.deb
-  command: apt install -y /data/bunkerweb.deb
+  ansible.builtin.command: apt install -y /data/bunkerweb.deb
 - name: (Ubuntu) Prevent bunkerweb from being upgraded
-  dpkg_selections:
+  ansible.builtin.dpkg_selections:
     name: bunkerweb
-    selection: hold
+    selection: "{{ 'hold' if versionlock else 'install' }}"
   when: freeze_versions|bool == true
+  tags: versionlock
 - name: (Ubuntu) Replace /etc/bunkerweb/variables.env
-  copy:
+  ansible.builtin.copy:
     src: "{{ variables_env }}"
     dest: /etc/bunkerweb/variables.env
     owner: root
@@ -70,7 +72,7 @@
     force: yes  
   notify: (Handler) restart bunkerweb
 - name: (Ubuntu) Replace /etc/bunkerweb/ui.env
-  copy:
+  ansible.builtin.copy:
     src: "{{ custom_ui }}"
     dest: /etc/bunkerweb/ui.env
     owner: root
@@ -79,13 +81,13 @@
     force: yes  
   notify: (Handler) restart bunkerweb-ui
 - name: (Ubuntu) If var {{enable_ui}} is false, systemctl disable bunkerweb-ui
-  service:
+  ansible.builtin.service:
     name: bunkerweb-ui
     state: stopped
     enabled: no
   when: enable_ui|bool == false
 - name: (Ubuntu) Loop dictionary {{custom_configs_path}} and copy files to /etc/bunkerweb/configs 
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.value }}"
     dest: /usr/share/bunkerweb/configs/
     owner: root
@@ -96,7 +98,7 @@
   with_dict: "{{ custom_configs_path }}"
   when: item.value != None
 - name: (Ubuntu) Add /var/www/html with {{custom_www}}
-  copy:
+  ansible.builtin.copy:
     src: "{{ custom_www }}"
     dest: /var/www/html/
     owner: "{{ custom_www_owner }}"
@@ -106,7 +108,7 @@
   notify: (Handler) restart bunkerweb
   when: custom_www|length > 0
 - name: Recursively change permission of folders
-  file:
+  ansible.builtin.file:
     path: /var/www/html/{{custom_www}}
     state: directory
     recurse: yes
@@ -115,7 +117,7 @@
   notify: (Handler) restart bunkerweb
   when: custom_www|length > 0
 - name: (Ubuntu) Add /etc/bunkerweb/plugins/ with {{custom_plugins}}
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: /etc/bunkerweb/plugins/
     owner: nginx
