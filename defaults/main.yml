@@ -7,15 +7,13 @@ bunkerweb_version: 1.5.0
 # Default: 1.24.0
 nginx_version: 1.24.0
 
-# Used to not upgrade Bunkerweb and Nginx after a "apt-get upgrade".
+# Used to not upgrade Bunkerweb and Nginx after a "apt upgrade" or "dnf update".
 # There is no reason to touch it unless you know what you are doing.
 # Because Bunkerweb didn't work with the latest versions of Nginx.
 # Default: true
-freeze_versions: true
-
-# Used for dnf/yum-versionlock. 
-# In combination with the tag 'versionlock' youre able to just disable the versionlocks.
-version_lock_state: present
+freeze_versions: True
+# To disable existing versionlocks, set this to False and run the play with the tag 'versionlock' 
+versionlock: True
 
 
 # Used to activate the Bunkerweb ui .

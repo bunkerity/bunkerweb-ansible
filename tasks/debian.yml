@@ -36,8 +36,9 @@
 - name: (Debian) Prevent nginx from being upgraded
   dpkg_selections:
     name: nginx
-    selection: hold
+    selection: "{{ 'hold' if versionlock else 'install' }}"
   when: freeze_versions|bool == true
+  tags: versionlock
   # FOR FINAL RELEASE, UNCOMMENT THE FOLLOWING TASKS
 # - name: (Debian) add bunkerweb key
 #   apt_key:
@@ -59,8 +60,9 @@
 - name: (Debian) Prevent bunkerweb from being upgraded
   dpkg_selections:
     name: bunkerweb
-    selection: hold
+    selection: "{{ 'hold' if versionlock else 'install' }}"
   when: freeze_versions|bool == true
+  tags: versionlock
 - name: (Debian) Replace /etc/bunkerweb/variables.env
   copy:
     src: "{{ variables_env }}"

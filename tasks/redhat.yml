@@ -31,9 +31,11 @@
     name: "python3-dnf-plugin-versionlock"
     state: present
 - name: (Rhel) Prevent nginx from being updated
-  community.general.yum_versionlock:
-    state: present
+  community.general.dnf_versionlock:
     name: "nginx-{{ nginx_version }}"
+    state: "{{ 'present' if versionlock else 'absent' }}"
+  when: freeze_versions|bool == true
+  tags: versionlock
 # FOR FINAL RELEASE, UNCOMMENT THE FOLLOWING TASKS
 # - name: (Rhel) add bunkerweb rpm-key
 #   rpm_key: 
@@ -56,9 +58,11 @@
 - name: (Rhel) Install from /data/bunkerweb.rpm
   command: dnf install -y /data/bunkerweb.rpm
 - name: (Rhel) Prevent bunkerweb from being updated
-  community.general.yum_versionlock:
-    state: present
+  community.general.dnf_versionlock:
     name: "bunkerweb={{ bunkerweb_version }}"
+    state: "{{ 'present' if versionlock else 'absent' }}"
+  when: freeze_versions|bool == true
+  tags: versionlock
 - name: (Rhel) Replace /etc/bunkerweb/variables.env
   copy:
     src: "{{ variables_env }}"
